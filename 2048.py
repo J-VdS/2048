@@ -8,12 +8,12 @@ import random, tkinter, time
 class game(object):
     def __init__(self, tk, canvas):
         self.tk, self.canvas = tk, canvas
+        self.alive = True
         #kleuren
         self.colors = {2:'#08ed15' ,4:'#9f3396', 8:'#00962a', 16:'#55a2ac', \
                     32:'#ab1255', 64:'#ffff00', 128:'#00ffff', 256:'#ff00ff', \
                     512:'#ffa500', 1024:'#ff0000', 2048:'#00ff9f'}
         self.nummers = [0] * 16
-        #print(self.nummers)
         #om te beginnen moeten ze gewoon verschillen
         self.oud = None
         self.draw()
@@ -33,16 +33,12 @@ class game(object):
         for i in range(0,15,4):
              tta = self.combine(self.shift(self.nummers[i:i+4]))
              self.nummers[i:i+4] = self.shift(tta)
-             
-             
         self.draw()
-        #print(self.nummers, self.oud)
-        
-            
+          
         
     def move_right(self, evt):
         #we vormen eerst alles om naar een linkse rotatie en dan terug
-        #Kon via splicing :(
+        #Kon via splicing :( nog niet optimaal
         self.oud = self.nummers.copy()
         calc = 16*[0]
         for reeks in range(0,16,4):
@@ -59,15 +55,9 @@ class game(object):
     def move_up(self, evt):
 
         self.oud = self.nummers.copy()
-
-        calc = [0]*16
         for i in range(4):
             kolom = self.nummers[i:16:4]
-            calc[4*i:4*i+4] = self.shift(self.combine(self.shift(kolom)))
-        print(calc)
-        #terug in self.nummers pluggen:
-        for i in range(4):
-            self.nummers[4*i:4*i+4] = calc[i:16:4]
+            self.nummers[i:16:4] =  self.shift(self.combine(self.shift(kolom)))
         self.draw()
 
     def move_down(self, evt):
@@ -88,6 +78,7 @@ class game(object):
         i = self.nummers.count(0)
         if i == 0:
             print('game over')
+            self.alive = False
             return
         if self.oud == self.nummers:
             return
@@ -133,4 +124,14 @@ tk.wm_attributes('-topmost', 1)
 canvas = tkinter.Canvas(tk, width=201, height=201, bd=0, highlightthickness=0)
 canvas.pack()
 k = game(tk, canvas)
+
+while k.alive:
+    tk.update()
+    tk.update_idletasks()
+
+time.sleep(2)
+tk.destroy()
+    
+
+    
 
